@@ -9,12 +9,12 @@ namespace Proyecto_banco
 
         private static int contadorCuentas = 1;
 
-        public Cliente(string identificacion, string nombreCompleto, string NumeroCuenta, decimal Saldo)
+        public Cliente(string identificacion, string nombreCompleto, string numeroCuenta, decimal saldo)
         {
-            this = identificacion;
-            this = nombreCompleto;
-            this = GenerarNumeroCuenta();
-            Saldo = 0;
+            Identificacion = identificacion;
+            NombreCompleto = nombreCompleto;
+            NumeroCuenta = GenerarNumeroCuenta();
+            Saldo = saldo;
         }
 
         private string GenerarNumeroCuenta()

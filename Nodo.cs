@@ -1,14 +1,11 @@
-namespace  Proyecto_banco
+public class Nodo<T>
 {
-    public class Nodo
-    {
-        public Cliente Cliente { get; set; }
-        public Nodo? Siguiente { get; set; }
+    public T Dato;
+    public Nodo<T> Siguiente;
 
-        public Nodo(Cliente cliente)
-        {
-            this.Cliente = cliente;
-            this.Siguiente = null;
-        }
+    public Nodo(T dato)
+    {
+        Dato = dato;
+        Siguiente = null;
     }
 }
