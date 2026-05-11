@@ -7,26 +7,6 @@ public class Pila<T>
         cima = null;
     }
 
-    public Pila(Nodo<T> nodoCima)
-    {
-        cima = nodoCima;
-    }
-
-    public Pila(ListaEnlazada<T> lista)
-    {
-        cima = lista.ObtenerCabeza();
-    }
-
-    public Pila(Cola<T> cola)
-    {
-        cima = cola.ObtenerPrimero();
-    }
-
-    public Nodo<T> ObtenerPrimero()
-    {
-        return cima;
-    }
-
     // Apilar
     public void Push(T dato)
     {

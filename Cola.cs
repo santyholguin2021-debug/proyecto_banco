@@ -9,29 +9,6 @@ public class Cola<T>
         final = null;
     }
 
-    public Cola(Nodo<T> frenteNodo)
-    {
-        frente = frenteNodo;
-        final = ObtenerUltimo(frenteNodo);
-    }
-
-    public Cola(ListaEnlazada<T> lista)
-    {
-        frente = lista.ObtenerCabeza();
-        final = ObtenerUltimo(frente);
-    }
-
-    public Cola(Pila<T> pila)
-    {
-        frente = pila.ObtenerPrimero();
-        final = ObtenerUltimo(frente);
-    }
-
-    public Nodo<T> ObtenerCabeza()
-    {
-        return frente;
-    }
-
     // Encolar (agregar al final)
     public void Encolar(T dato)
     {

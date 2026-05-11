@@ -7,26 +7,6 @@ public class ListaEnlazada<T>
         cabeza = null;
     }
 
-    public ListaEnlazada(Nodo<T> nodoInicial)
-    {
-        cabeza = nodoInicial;
-    }
-
-    public ListaEnlazada(Cola<T> cola)
-    {
-        cabeza = cola.ObtenerCabeza();
-    }
-
-    public ListaEnlazada(Pila<T> pila)
-    {
-        cabeza = pila.ObtenerPrimero();
-    }
-
-    public Nodo<T> ObtenerCabeza()
-    {
-        return cabeza;
-    }
-
     // Insertar al final
     public void Insertar(T dato)
     {
