@@ -80,6 +80,51 @@ namespace ProyectoBanco
             }
         }
 
+        // Método para leer número de cuenta con validación (12 dígitos)
+        static string LeerNumeroCuenta(string mensaje)
+        {
+            while (true)
+            {
+                Console.Write(mensaje);
+                string cuenta = Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(cuenta))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Error: El número de cuenta no puede estar vacío.");
+                    Console.ResetColor();
+                    continue;
+                }
+
+                if (cuenta.Length != 12)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Error: El número de cuenta debe tener exactamente 12 dígitos.");
+                    Console.ResetColor();
+                    continue;
+                }
+
+                if (!long.TryParse(cuenta, out _))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Error: El número de cuenta solo debe contener dígitos.");
+                    Console.ResetColor();
+                    continue;
+                }
+
+                return cuenta;
+            }
+        }
+
+        // Método para formatear número de cuenta en grupos de 4 dígitos
+        static string FormatearNumeroCuenta(string numeroCuenta)
+        {
+            if (string.IsNullOrEmpty(numeroCuenta) || numeroCuenta.Length != 12)
+                return numeroCuenta;
+
+            return $"{numeroCuenta.Substring(0, 4)}-{numeroCuenta.Substring(4, 4)}-{numeroCuenta.Substring(8, 4)}";
+        }
+
         static void Main(string[] args)
         {
             Banco banco = new Banco();
@@ -114,14 +159,14 @@ namespace ProyectoBanco
                         {
                             string cedula = LeerCadenaValida("Identificacion: ");
                             string nombre = LeerCadenaValida("NombreCompleto: ");
-                            string cuenta = LeerCadenaValida("NumeroCuenta: ");
+                            string cuenta = LeerNumeroCuenta("NumeroCuenta: ");
                             double saldo = LeerNumeroPositivo("Saldo: ");
 
                             Cliente nuevo = new Cliente(cedula, nombre, cuenta, saldo);
                             banco.Clientes.AgregarCliente(nuevo);
 
                             Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine("Cliente registrado exitosamente.");
+                            Console.WriteLine($"Cliente registrado exitosamente. Cuenta: {FormatearNumeroCuenta(cuenta)}");
                             Console.ResetColor();
                         }
                         catch (Exception ex)
@@ -148,13 +193,16 @@ namespace ProyectoBanco
                     case 3:
                         try
                         {
-                            string cuenta = LeerCadenaValida("NumeroCuenta: ");
+                            string cuenta = LeerNumeroCuenta("NumeroCuenta: ");
                             Cliente cliente = banco.Clientes.BuscarCliente(cuenta);
 
                             if (cliente != null)
                             {
                                 Console.ForegroundColor = ConsoleColor.Green;
-                                Console.WriteLine(cliente);
+                                Console.WriteLine($"Identificación: {cliente.Cedula}");
+                                Console.WriteLine($"Nombre: {cliente.Nombre}");
+                                Console.WriteLine($"Cuenta: {FormatearNumeroCuenta(cliente.Cuenta)}");
+                                Console.WriteLine($"Saldo: ${cliente.Saldo:F2}");
                                 Console.ResetColor();
                             }
                             else
@@ -175,7 +223,7 @@ namespace ProyectoBanco
                     case 4:
                         try
                         {
-                            string cuenta = LeerCadenaValida("Cuenta cliente: ");
+                            string cuenta = LeerNumeroCuenta("NumeroCuenta: ");
                             Cliente cliente = banco.Clientes.BuscarCliente(cuenta);
 
                             if (cliente != null)
@@ -229,7 +277,7 @@ namespace ProyectoBanco
                     case 6:
                         try
                         {
-                            string cuenta = LeerCadenaValida("NumeroCuenta: ");
+                            string cuenta = LeerNumeroCuenta("NumeroCuenta: ");
                             double monto = LeerNumeroPositivo("Monto a depositar: ");
 
                             banco.Depositar(cuenta, monto);
@@ -254,7 +302,7 @@ namespace ProyectoBanco
                     case 7:
                         try
                         {
-                            string cuenta = LeerCadenaValida("NumeroCuenta: ");
+                            string cuenta = LeerNumeroCuenta("NumeroCuenta: ");
                             double monto = LeerNumeroPositivo("Monto a retirar: ");
 
                             banco.Retirar(cuenta, monto);
@@ -279,7 +327,7 @@ namespace ProyectoBanco
                     case 8:
                         try
                         {
-                            string cuenta = LeerCadenaValida("NumeroCuenta: ");
+                            string cuenta = LeerNumeroCuenta("NumeroCuenta: ");
                             Cliente cliente = banco.Clientes.BuscarCliente(cuenta);
 
                             if (cliente != null)
