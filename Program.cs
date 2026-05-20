@@ -1,434 +1,457 @@
-using ProyectoBanco.Entidades;
-using ProyectoBanco.Logica;
+using System;
 
-namespace ProyectoBanco
+namespace Proyecto_banco
 {
     internal class Program
     {
-        // Método para leer entrada numérica con validación
-        static int LeerOpcionMenu()
-        {
-            while (true)
-            {
-                Console.Write("Opcion: ");
-                if (int.TryParse(Console.ReadLine(), out int opcion))
-                {
-                    if (opcion >= 1 && opcion <= 13)
-                    {
-                        return opcion;
-                    }
-                    else
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Error: Ingrese una opción entre 1 y 13.");
-                        Console.ResetColor();
-                    }
-                }
-                else
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Error: Ingrese un número válido.");
-                    Console.ResetColor();
-                }
-            }
-        }
-
-        // Método para leer cadena no vacía
-        static string LeerCadenaValida(string mensaje)
-        {
-            while (true)
-            {
-                Console.Write(mensaje);
-                string valor = Console.ReadLine();
-
-                if (string.IsNullOrWhiteSpace(valor))
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Error: El campo no puede estar vacío.");
-                    Console.ResetColor();
-                    continue;
-                }
-                return valor;
-            }
-        }
-
-        // Método para leer número decimal con validación
-        static double LeerNumeroPositivo(string mensaje)
-        {
-            while (true)
-            {
-                Console.Write(mensaje);
-                if (double.TryParse(Console.ReadLine(), out double valor))
-                {
-                    if (valor > 0)
-                    {
-                        return valor;
-                    }
-                    else
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Error: Ingrese un valor mayor a cero.");
-                        Console.ResetColor();
-                    }
-                }
-                else
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Error: Ingrese un número válido.");
-                    Console.ResetColor();
-                }
-            }
-        }
-
-        // Método para leer número de cuenta con validación (12 dígitos)
-        static string LeerNumeroCuenta(string mensaje)
-        {
-            while (true)
-            {
-                Console.Write(mensaje);
-                string cuenta = Console.ReadLine();
-
-                if (string.IsNullOrWhiteSpace(cuenta))
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Error: El número de cuenta no puede estar vacío.");
-                    Console.ResetColor();
-                    continue;
-                }
-
-                if (cuenta.Length != 12)
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Error: El número de cuenta debe tener exactamente 12 dígitos.");
-                    Console.ResetColor();
-                    continue;
-                }
-
-                if (!long.TryParse(cuenta, out _))
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Error: El número de cuenta solo debe contener dígitos.");
-                    Console.ResetColor();
-                    continue;
-                }
-
-                return cuenta;
-            }
-        }
-
-        // Método para formatear número de cuenta en grupos de 4 dígitos
-        static string FormatearNumeroCuenta(string numeroCuenta)
-        {
-            if (string.IsNullOrEmpty(numeroCuenta) || numeroCuenta.Length != 12)
-                return numeroCuenta;
-
-            return $"{numeroCuenta.Substring(0, 4)}-{numeroCuenta.Substring(4, 4)}-{numeroCuenta.Substring(8, 4)}";
-        }
+        private static Banco banco = new Banco();
 
         static void Main(string[] args)
         {
-            Banco banco = new Banco();
-
             int opcion;
 
             do
             {
                 Console.Clear();
+                MostrarMenu();
+                opcion = LeerEntero("Seleccione una opción: ");
 
-                Console.WriteLine("===== BANCO COLOMBIA =====");
-                Console.WriteLine("1. Registrar cliente");
-                Console.WriteLine("2. Listar clientes");
-                Console.WriteLine("3. Buscar cliente");
-                Console.WriteLine("4. Agregar cliente a cola");
-                Console.WriteLine("5. Atender cliente");
-                Console.WriteLine("6. Depositar");
-                Console.WriteLine("7. Retirar");
-                Console.WriteLine("8. Consultar saldo");
-                Console.WriteLine("9. Deshacer transaccion");
-                Console.WriteLine("10. Mostrar cola");
-                Console.WriteLine("11. Total clientes");
-                Console.WriteLine("12. Total dinero banco");
-                Console.WriteLine("13. Salir");
-
-                opcion = LeerOpcionMenu();
+                Console.Clear();
 
                 switch (opcion)
                 {
                     case 1:
-                        try
-                        {
-                            string cedula = LeerCadenaValida("Identificacion: ");
-                            string nombre = LeerCadenaValida("NombreCompleto: ");
-                            string cuenta = LeerNumeroCuenta("NumeroCuenta: ");
-                            double saldo = LeerNumeroPositivo("Saldo: ");
-
-                            Cliente nuevo = new Cliente(cedula, nombre, cuenta, saldo);
-                            banco.Clientes.AgregarCliente(nuevo);
-
-                            Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine($"Cliente registrado exitosamente. Cuenta: {FormatearNumeroCuenta(cuenta)}");
-                            Console.ResetColor();
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine($"Error al registrar cliente: {ex.Message}");
-                            Console.ResetColor();
-                        }
+                        RegistrarCliente();
                         break;
-
                     case 2:
-                        try
-                        {
-                            banco.Clientes.MostrarClientes();
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine($"Error al listar clientes: {ex.Message}");
-                            Console.ResetColor();
-                        }
+                        banco.MostrarClientes();
                         break;
-
                     case 3:
-                        try
-                        {
-                            string cuenta = LeerNumeroCuenta("NumeroCuenta: ");
-                            Cliente cliente = banco.Clientes.BuscarCliente(cuenta);
-
-                            if (cliente != null)
-                            {
-                                Console.ForegroundColor = ConsoleColor.Green;
-                                Console.WriteLine($"Identificación: {cliente.Cedula}");
-                                Console.WriteLine($"Nombre: {cliente.Nombre}");
-                                Console.WriteLine($"Cuenta: {FormatearNumeroCuenta(cliente.Cuenta)}");
-                                Console.WriteLine($"Saldo: ${cliente.Saldo:F2}");
-                                Console.ResetColor();
-                            }
-                            else
-                            {
-                                Console.ForegroundColor = ConsoleColor.Yellow;
-                                Console.WriteLine("Cliente no encontrado.");
-                                Console.ResetColor();
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine($"Error al buscar cliente: {ex.Message}");
-                            Console.ResetColor();
-                        }
+                        BuscarCliente();
                         break;
-
                     case 4:
-                        try
-                        {
-                            string cuenta = LeerNumeroCuenta("NumeroCuenta: ");
-                            Cliente cliente = banco.Clientes.BuscarCliente(cuenta);
-
-                            if (cliente != null)
-                            {
-                                banco.Cola.Encolar(cliente);
-                                Console.ForegroundColor = ConsoleColor.Green;
-                                Console.WriteLine("Cliente agregado a la cola.");
-                                Console.ResetColor();
-                            }
-                            else
-                            {
-                                Console.ForegroundColor = ConsoleColor.Yellow;
-                                Console.WriteLine("Cliente no existe. Verifique el número de cuenta.");
-                                Console.ResetColor();
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine($"Error al agregar a cola: {ex.Message}");
-                            Console.ResetColor();
-                        }
+                        AgregarClienteCola();
                         break;
-
                     case 5:
-                        try
-                        {
-                            Cliente cliente = banco.Cola.Desencolar();
-
-                            if (cliente != null)
-                            {
-                                Console.ForegroundColor = ConsoleColor.Green;
-                                Console.WriteLine($"Atendiendo a {cliente.Nombre}");
-                                Console.ResetColor();
-                            }
-                            else
-                            {
-                                Console.ForegroundColor = ConsoleColor.Yellow;
-                                Console.WriteLine("Cola vacía. No hay clientes para atender.");
-                                Console.ResetColor();
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine($"Error al atender cliente: {ex.Message}");
-                            Console.ResetColor();
-                        }
+                        AtenderCliente();
                         break;
-
                     case 6:
-                        try
-                        {
-                            string cuenta = LeerNumeroCuenta("NumeroCuenta: ");
-                            double monto = LeerNumeroPositivo("Monto a depositar: ");
-
-                            banco.Depositar(cuenta, monto);
-                            Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine("Depósito realizado exitosamente.");
-                            Console.ResetColor();
-                        }
-                        catch (ArgumentException ex)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Yellow;
-                            Console.WriteLine($"Advertencia: {ex.Message}");
-                            Console.ResetColor();
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine($"Error al depositar: {ex.Message}");
-                            Console.ResetColor();
-                        }
+                        RealizarDeposito();
                         break;
-
                     case 7:
-                        try
-                        {
-                            string cuenta = LeerNumeroCuenta("NumeroCuenta: ");
-                            double monto = LeerNumeroPositivo("Monto a retirar: ");
-
-                            banco.Retirar(cuenta, monto);
-                            Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine("Retiro realizado exitosamente.");
-                            Console.ResetColor();
-                        }
-                        catch (ArgumentException ex)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Yellow;
-                            Console.WriteLine($"Advertencia: {ex.Message}");
-                            Console.ResetColor();
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine($"Error al retirar: {ex.Message}");
-                            Console.ResetColor();
-                        }
+                        RealizarRetiro();
                         break;
-
                     case 8:
-                        try
-                        {
-                            string cuenta = LeerNumeroCuenta("NumeroCuenta: ");
-                            Cliente cliente = banco.Clientes.BuscarCliente(cuenta);
-
-                            if (cliente != null)
-                            {
-                                Console.ForegroundColor = ConsoleColor.Cyan;
-                                Console.WriteLine($"Saldo de {cliente.Nombre}: ${cliente.Saldo:F2}");
-                                Console.ResetColor();
-                            }
-                            else
-                            {
-                                Console.ForegroundColor = ConsoleColor.Yellow;
-                                Console.WriteLine("Cliente no encontrado.");
-                                Console.ResetColor();
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine($"Error al consultar saldo: {ex.Message}");
-                            Console.ResetColor();
-                        }
+                        ConsultarSaldo();
                         break;
-
+                    
                     case 9:
-                        try
-                        {
-                            banco.Deshacer();
-                            Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine("Última transacción deshecha.");
-                            Console.ResetColor();
-                        }
-                        catch (InvalidOperationException ex)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Yellow;
-                            Console.WriteLine($"Información: {ex.Message}");
-                            Console.ResetColor();
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine($"Error al deshacer transacción: {ex.Message}");
-                            Console.ResetColor();
-                        }
+                        EditarCliente();
                         break;
 
                     case 10:
-                        try
-                        {
-                            banco.Cola.MostrarCola();
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine($"Error al mostrar cola: {ex.Message}");
-                            Console.ResetColor();
-                        }
+                        DeshacerUltimaTransaccion();
                         break;
 
                     case 11:
-                        try
-                        {
-                            int totalClientes = banco.Clientes.ContarClientes();
-                            Console.ForegroundColor = ConsoleColor.Cyan;
-                            Console.WriteLine($"Total de clientes: {totalClientes}");
-                            Console.ResetColor();
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine($"Error al contar clientes: {ex.Message}");
-                            Console.ResetColor();
-                        }
+                        banco.MostrarCola();
                         break;
 
                     case 12:
-                        try
-                        {
-                            double totalDinero = banco.Clientes.TotalDinero();
-                            Console.ForegroundColor = ConsoleColor.Cyan;
-                            Console.WriteLine($"Total dinero en banco: ${totalDinero:F2}");
-                            Console.ResetColor();
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine($"Error al calcular total: {ex.Message}");
-                            Console.ResetColor();
-                        }
+                        Console.WriteLine($"Total de clientes: {banco.TotalClientes()}");
                         break;
 
+                    case 13:
+                        Console.WriteLine($"Total de dinero en el banco: ${banco.TotalDineroBanco():N2}");
+                        break;
+
+                    case 14:
+                        Console.WriteLine("===== PROGRAMA FINALIZADO =====");
+                        break;
                     default:
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Opción no válida.");
-                        Console.ResetColor();
+                        Console.WriteLine("Opción inválida.");
                         break;
                 }
 
-                Console.WriteLine("\nPresione una tecla...");
-                Console.ReadKey();
+                if (opcion != 14)
+                {
+                    Pausa();
+                }
 
-            } while (opcion != 13);
+            } while (opcion != 14);
+        }
+
+        static void MostrarMenu()
+        {
+            Console.WriteLine("====================================");
+            Console.WriteLine("      BANCO COLOMBIANO            ");
+            Console.WriteLine("====================================");
+            Console.WriteLine("1. Registrar cliente");
+            Console.WriteLine("2. Listar clientes");
+            Console.WriteLine("3. Buscar cliente");
+            Console.WriteLine("4. Agregar cliente a cola");
+            Console.WriteLine("5. Atender siguiente cliente");
+            Console.WriteLine("6. Realizar depósito");
+            Console.WriteLine("7. Realizar retiro");
+            Console.WriteLine("8. Consultar saldo");
+            Console.WriteLine("9. Editar cliente");
+            Console.WriteLine("10. Deshacer última transacción");
+            Console.WriteLine("11. Mostrar cola de atención");
+            Console.WriteLine("12. Mostrar total de clientes");
+            Console.WriteLine("13. Mostrar total de dinero del banco");
+            Console.WriteLine("14. Salir\n");
+        }
+
+        static void RegistrarCliente()
+        {
+            Console.WriteLine("===== REGISTRO DE CLIENTE =====");
+
+            string identificacion = LeerTexto("Identificación: ");
+            string nombre = LeerNombre("Nombre completo: ");
+            string cuenta = LeerNumeroCuenta();
+            decimal saldo = LeerDecimal("Saldo inicial: ");
+
+            Cliente cliente = new Cliente(identificacion, nombre, cuenta, saldo);
+
+            if (banco.RegistrarCliente(cliente))
+            {
+                Console.WriteLine("Cliente registrado correctamente.");
+            }
+            else
+            {
+                Console.WriteLine("Ya existe un cliente con esa identificación o cuenta.");
+            }
+        }
+
+        static void BuscarCliente()
+        {
+            string cuenta = LeerTexto("Ingrese el número de cuenta: ");
+            Cliente cliente = banco.BuscarCliente(cuenta);
+
+            if (cliente == null)
+            {
+                Console.WriteLine("Cliente no encontrado.");
+                return;
+            }
+
+            Console.WriteLine(cliente);
+        }
+
+        static void AgregarClienteCola()
+        {
+            string cuenta = LeerTexto("Número de cuenta: ");
+
+            if (banco.AgregarACola(cuenta))
+            {
+                Console.WriteLine("Cliente agregado a la cola de atención.");
+            }
+            else
+            {
+                Cliente cliente = banco.BuscarCliente(cuenta);
+                if (cliente == null)
+                {
+                    Console.WriteLine("Cuenta no encontrada.");
+                }
+                else
+                {
+                    Console.WriteLine("Este cliente ya está en la cola de atención.");
+                }
+            }
+        }
+
+        static void AtenderCliente()
+        {
+            Cliente cliente = banco.AtenderCliente();
+
+            if (cliente == null)
+            {
+                Console.WriteLine("No hay clientes en la cola.");
+                return;
+            }
+
+            Console.WriteLine($"Atendiendo a: {cliente.NombreCompleto}");
+        }
+
+        static void RealizarDeposito()
+        {
+            string cuenta = LeerTexto("Número de cuenta: ");
+            decimal monto = LeerDecimal("Monto a depositar: ");
+
+            if (banco.Depositar(cuenta, monto))
+            {
+                Console.WriteLine("Depósito realizado correctamente.");
+            }
+            else
+            {
+                Console.WriteLine("No fue posible realizar el depósito.");
+            }
+        }
+
+        static void RealizarRetiro()
+        {
+            string cuenta = LeerTexto("Número de cuenta: ");
+            decimal monto = LeerDecimal("Monto a retirar: ");
+
+            if (banco.Retirar(cuenta, monto))
+            {
+                Console.WriteLine("Retiro realizado correctamente.");
+            }
+            else
+            {
+                Console.WriteLine("Saldo insuficiente o cuenta inexistente.");
+            }
+        }
+
+        static void ConsultarSaldo()
+        {
+            string cuenta = LeerTexto("Número de cuenta: ");
+            Cliente cliente = banco.BuscarCliente(cuenta);
+
+            if (cliente == null)
+            {
+                Console.WriteLine("Cliente no encontrado.");
+                return;
+            }
+
+            Console.WriteLine($"Saldo actual: ${cliente.Saldo:N2}");
+        }
+
+        static void DeshacerUltimaTransaccion()
+        {
+            if (banco.DeshacerUltimaTransaccion())
+            {
+                Console.WriteLine("Última transacción revertida correctamente.");
+            }
+            else
+            {
+                Console.WriteLine("No existen transacciones para deshacer.");
+            }
+        }
+
+        static int LeerEntero(string mensaje)
+        {
+            int numero;
+
+            do
+            {
+                Console.Write(mensaje);
+
+                if (int.TryParse(Console.ReadLine(), out numero))
+                {
+                    break;
+                }
+
+                Console.WriteLine("Ingrese una opción válida.");
+
+            } while (true);
+
+            return numero;
+        }
+
+        static decimal LeerDecimal(string mensaje)
+        {
+            decimal numero;
+
+            do
+            {
+                Console.Write(mensaje);
+
+                if (decimal.TryParse(Console.ReadLine(), out numero) && numero >= 0)
+                {
+                    break;
+                }
+
+                Console.WriteLine("Ingrese un valor numérico válido mayor o igual a 0.");
+
+            } while (true);
+
+            return numero;
+        }
+
+        static string LeerTexto(string mensaje)
+        {
+            string texto;
+
+            do
+            {
+                Console.Write(mensaje);
+                texto = Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(texto))
+                {
+                    Console.WriteLine("El campo no puede estar vacío.");
+                }
+            }
+            while (string.IsNullOrWhiteSpace(texto));
+
+            return texto.Trim();
+        }
+
+        static string LeerNombre(string mensaje)
+        {
+            string texto;
+
+            do
+            {
+                Console.Write(mensaje);
+                texto = Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(texto))
+                {
+                    Console.WriteLine("El campo no puede estar vacío.");
+                    continue;
+                }
+
+                if (!EsSoloLetras(texto))
+                {
+                    Console.WriteLine("El nombre solo puede contener letras y espacios.");
+                    continue;
+                }
+
+                break;
+            }
+            while (true);
+
+            return texto.Trim();
+        }
+
+        static bool EsSoloLetras(string texto)
+        {
+            foreach (char caracter in texto)
+            {
+                if (!char.IsLetter(caracter) && !char.IsWhiteSpace(caracter))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        static string LeerNumeroCuenta()
+        {
+            string cuenta;
+
+            do
+            {
+                Console.Write("Número de cuenta (12 dígitos): ");
+                cuenta = Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(cuenta))
+                {
+                    Console.WriteLine("El número de cuenta es obligatorio.");
+                    continue;
+                }
+
+                bool soloNumeros = true;
+
+                for (int i = 0; i < cuenta.Length; i++)
+                {
+                    if (!char.IsDigit(cuenta[i]))
+                    {
+                        soloNumeros = false;
+                        break;
+                    }
+                }
+
+                if (!soloNumeros || cuenta.Length != 12)
+                {
+                    Console.WriteLine("El número de cuenta debe contener exactamente 12 dígitos numéricos.");
+                }
+
+            }
+            while (string.IsNullOrWhiteSpace(cuenta) || cuenta.Length != 12 || !EsNumero(cuenta));
+
+            return cuenta;
+        }
+
+        static bool EsNumero(string texto)
+        {
+            for (int i = 0; i < texto.Length; i++)
+            {
+                if (!char.IsDigit(texto[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        static void EditarCliente()
+        {
+            Console.Write("Ingrese el número de cuenta del cliente a editar: ");
+            string cuenta = Console.ReadLine();
+
+            Cliente cliente = banco.BuscarCliente(cuenta);
+
+            if (cliente == null)
+            {
+                Console.WriteLine("Cliente no encontrado.");
+                return;
+            }
+
+            Console.WriteLine("Deje vacío si no desea cambiar un dato.");
+
+            Console.Write($"Nuevo nombre ({cliente.NombreCompleto}): ");
+            string nuevoNombre = Console.ReadLine();
+
+            if (!string.IsNullOrWhiteSpace(nuevoNombre))
+            {
+                if (EsSoloLetras(nuevoNombre))
+                {
+                    cliente.NombreCompleto = nuevoNombre.Trim();
+                }
+                else
+                {
+                    Console.WriteLine("El nombre solo puede contener letras y espacios. No se realizó el cambio.");
+                }
+            }
+
+            string nuevaCuenta;
+
+            do
+            {
+                Console.Write($"Nuevo número de cuenta ({cliente.NumeroCuenta}): ");
+                nuevaCuenta = Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(nuevaCuenta))
+                {
+                    break;
+                }
+
+                if (nuevaCuenta.Length == 12 && long.TryParse(nuevaCuenta, out _))
+                {
+                    cliente.NumeroCuenta = nuevaCuenta;
+                    break;
+                }
+
+                Console.WriteLine("El número de cuenta debe tener exactamente 12 dígitos.");
+
+            } while (true);
+
+            Console.Write($"Nuevo saldo (${cliente.Saldo:N2}): ");
+            string nuevoSaldoStr = Console.ReadLine();
+
+            if (!string.IsNullOrWhiteSpace(nuevoSaldoStr))
+            {
+                if (decimal.TryParse(nuevoSaldoStr, out decimal nuevoSaldo) && nuevoSaldo >= 0)
+                {
+                    cliente.Saldo = nuevoSaldo;
+                }
+                else
+                {
+                    Console.WriteLine("Saldo inválido. No se realizó el cambio.");
+                }
+            }
+
+            Console.WriteLine("Cliente actualizado correctamente.");
+        }
+
+        static void Pausa()
+        {
+            Console.WriteLine("\nPresione ENTER para continuar...");
+            Console.ReadLine();
         }
     }
 }

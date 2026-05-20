@@ -7,28 +7,17 @@ namespace Proyecto_banco
         public string NumeroCuenta { get; set; }
         public decimal Saldo { get; set; }
 
-        private static int contadorCuentas = 1;
-
-        public Cliente(string identificacion, string nombreCompleto, string NumeroCuenta, decimal Saldo)
+        public Cliente(string identificacion, string nombreCompleto, string numeroCuenta, decimal saldo)
         {
-            this = identificacion;
-            this = nombreCompleto;
-            this = GenerarNumeroCuenta();
-            Saldo = 0;
-        }
-
-        private string GenerarNumeroCuenta()
-        {
-            string numeroConsecutivo = contadorCuentas.ToString().PadLeft(8, '0');
-            string numeroCuenta = $"0001{numeroConsecutivo}";
-            contadorCuentas++;
-            return numeroCuenta;
+            Identificacion = identificacion;
+            NombreCompleto = nombreCompleto;
+            NumeroCuenta = numeroCuenta;
+            Saldo = saldo;
         }
 
         public override string ToString()
         {
-            string cuentaFormateada = $"{NumeroCuenta.Substring(0, 4)}-{NumeroCuenta.Substring(4, 8)}";
-            return $"ID: {Identificacion} | Nombre: {NombreCompleto} | Cuenta: {cuentaFormateada} | Saldo: ${Saldo:N2}";
+            return $"ID: {Identificacion} | Nombre: {NombreCompleto} | Cuenta: {NumeroCuenta} | Saldo: ${Saldo:N2}";
         }
     }
 }
