@@ -107,7 +107,7 @@ namespace Proyecto_banco
             Console.WriteLine("===== REGISTRO DE CLIENTE =====");
 
             string identificacion = LeerTexto("Identificación: ");
-            string nombre = LeerTexto("Nombre completo: ");
+            string nombre = LeerNombre("Nombre completo: ");
             string cuenta = LeerNumeroCuenta();
             decimal saldo = LeerDecimal("Saldo inicial: ");
 
@@ -287,6 +287,47 @@ namespace Proyecto_banco
             return texto.Trim();
         }
 
+        static string LeerNombre(string mensaje)
+        {
+            string texto;
+
+            do
+            {
+                Console.Write(mensaje);
+                texto = Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(texto))
+                {
+                    Console.WriteLine("El campo no puede estar vacío.");
+                    continue;
+                }
+
+                if (!EsSoloLetras(texto))
+                {
+                    Console.WriteLine("El nombre solo puede contener letras y espacios.");
+                    continue;
+                }
+
+                break;
+            }
+            while (true);
+
+            return texto.Trim();
+        }
+
+        static bool EsSoloLetras(string texto)
+        {
+            foreach (char caracter in texto)
+            {
+                if (!char.IsLetter(caracter) && !char.IsWhiteSpace(caracter))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         static string LeerNumeroCuenta()
         {
             string cuenta;
@@ -357,7 +398,14 @@ namespace Proyecto_banco
 
             if (!string.IsNullOrWhiteSpace(nuevoNombre))
             {
-                cliente.NombreCompleto = nuevoNombre;
+                if (EsSoloLetras(nuevoNombre))
+                {
+                    cliente.NombreCompleto = nuevoNombre.Trim();
+                }
+                else
+                {
+                    Console.WriteLine("El nombre solo puede contener letras y espacios. No se realizó el cambio.");
+                }
             }
 
             string nuevaCuenta;
